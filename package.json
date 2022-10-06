@@ -1,0 +1,16 @@
+{
+  "name": "cordova-plugin-purchase-mock",
+  "version": "1.0.0",
+  "description": "A mock implementation of the `store` object provided by [cordova-plugin-purchase](https://github.com/j3k0/cordova-plugin-purchase)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cordova-plugin-purchase": "^11.0.0"
+  },
+  "devDependencies": {}
+}
