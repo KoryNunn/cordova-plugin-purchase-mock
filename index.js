@@ -25,10 +25,31 @@ function createMockStore(options = {}, remoteProducts = {}) {
     }
   }
 
-  function createHandlerMethod(id, action) {
-    log(`when ${id} ...`);
+  function removeHandler(id, action, handler) {
+    log(`off ${id} ...`);
     return {
       [action]: (handler) => {
+        log(`  ${action} handler removed`);
+        const index = context.handlers.products?.[id]?.[action]?.indexOf(handler);
+
+        if(index >= 0) {
+          context.handlers.products[id][action].splice(index, 1);
+        }
+      }
+    }
+  }
+
+  function createHandlerMethod(id, action, once) {
+    log(`when ${id} ...`);
+
+    return {
+      [action]: (handler) => {
+        const originalHandler = handler;
+        handler = once ? (...args) => {
+          removeHandler(id, action, handler);
+          originalHandler(...args);
+        } : handler;
+
         log(`  ${action} handler added`);
         context.handlers.products ??= {};
         context.handlers.products[id] ??= {};
@@ -55,6 +76,21 @@ function createMockStore(options = {}, remoteProducts = {}) {
         ...createHandlerMethod(id, 'approved'),
         ...createHandlerMethod(id, 'cancelled'),
         ...createHandlerMethod(id, 'loaded')
+      }
+    },
+    once: (...args) => {
+      if (args.length === 3) {
+        const [id, action, callback] = args;
+        createHandlerMethod(id, action, true)[action](callback);
+        return;
+      }
+
+      const [id] = args;
+
+      return {
+        ...createHandlerMethod(id, 'approved', true),
+        ...createHandlerMethod(id, 'cancelled', true),
+        ...createHandlerMethod(id, 'loaded', true)
       }
     },
     order: async (id) => {
